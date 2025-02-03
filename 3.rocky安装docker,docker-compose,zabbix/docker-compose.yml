@@ -1,0 +1,70 @@
+version: '3.1'
+
+services:
+
+  zabbix-postgresql:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+      POSTGRES_DB: zabbix
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  zabbix-server:
+    image: zabbix/zabbix-server-postgresql:latest
+    environment:
+      DB_SERVER_HOST: zabbix-postgresql
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+      DB_NAME: zabbix
+    ports:
+      - "10051:10051"
+    depends_on:
+      - zabbix-postgresql
+    restart: always
+
+  zabbix-web-nginx:
+    image: zabbix/zabbix-web-nginx:latest
+    environment:
+      DB_SERVER_HOST: zabbix-postgresql
+      POSTGRES_USER: zabbix
+      POSTGRES_PASSWORD: zabbix_pass
+      ZBX_SERVER_HOST: zabbix-server
+      PHP_TZ: Asia/Shanghai
+    ports:
+      - "8080:8080"
+    depends_on:
+      - zabbix-server
+    restart: always
+
+volumes:
+  pgdata:
+
+
+# 3. 启动 Zabbix 服务
+# 在终端中，切换到包含 docker-compose.yml 文件的目录，然后运行以下命令启动所有服务：
+
+# bash
+# docker-compose up -d
+# 4. 访问 Zabbix Web 界面
+# 打开浏览器，访问 http://<你的服务器IP>:8080。根据提示，输入以下信息：
+
+# Zabbix server: zabbix-server
+# Host name: zabbix-postgresql
+# Database name: zabbix
+# User: zabbix
+# Password: zabbix_pass
+# 完成设置后，您将可以使用 Zabbix。
+
+# 5. 停止和删除容器
+# 如果需要停止 Zabbix 服务，可以使用以下命令：
+
+# bash
+# docker-compose down
+# 注意事项
+# 确保您的防火墙允许访问相应的端口（例如 8080 和 10051）。
+# 根据需要修改数据库用户名、密码和其他配置。
+# 请定期备份您的 Zabbix 数据库。
+# 这样，您就可以在 Rocky Linux 上通过 Docker 成功安装和运行 Zabbix 了！
