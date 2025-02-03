@@ -1,3 +1,11 @@
+# 手动拉取镜像，这样可以不用登录
+# 可以直接使用 docker pull 命令来拉取所需的镜像，例如：
+
+# bash
+# docker pull zabbix/zabbix-server-postgresql:latest
+# docker pull zabbix/zabbix-web-nginx:latest
+# docker pull postgres:13
+
 version: '3.1'
 
 services:
